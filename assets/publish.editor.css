@@ -1,0 +1,25 @@
+.quill-ctn .tab-panel {
+	overflow: inherit !important;
+}
+
+.quill-editor {
+	background-color: #fff;
+}
+
+.ql-editor {
+	font-size: 1.5rem;
+}
+
+.ql-editor h1, .ql-editor h2, .ql-editor h3, .ql-editor h4, .ql-editor h5, .ql-editor h6 {
+	margin: 0 !important;
+	padding: 0 !important;
+	margin-bottom: 2rem !important;
+}
+
+.ql-editor p, .ql-editor blockquote, .ql-editor ol, .ql-editor ul {
+	margin-bottom: 2rem !important;
+}
+
+.ql-editor p:last-child, .ql-editor blockquote:last-child {
+	margin-bottom: 0rem !important;
+}
