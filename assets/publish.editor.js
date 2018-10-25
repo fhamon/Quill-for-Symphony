@@ -56,6 +56,15 @@
 				t.val(markdown);
 			});
 
+			editor.clipboard.addMatcher(window.Node.ELEMENT_NODE, function (node, delta) {
+				delta.ops = delta.ops.map(function (op) {
+					return {
+						insert: op.insert
+					};
+				});
+				return delta;
+			});
+
 		});
 	};
 
