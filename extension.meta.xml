@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <extension id="quill_for_symphony" status="released" xmlns="http://getsymphony.com/schemas/extension/1.0">
 	<name>Quill Editor for Symphony</name>
+	<description>A modern text editor for Symphony.</description>
 	<authors>
 		<author>
 			<name github="deuxhuithuit">Deux Huit Huit</name>
