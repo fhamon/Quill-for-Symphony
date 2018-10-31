@@ -6,6 +6,34 @@
 		item: 'textarea[class*="markdown"], textarea[class*="commonmark"]'
 	};
 
+	var Delta = window.Quill.import('delta');
+	var Break = window.Quill.import('blots/break');
+	var Embed = window.Quill.import('blots/embed');
+
+	var lineBreakMatcher = function () {
+		var newDelta = new Delta();
+		newDelta.insert({'break': ''});
+		return newDelta;
+	};
+
+	class SmartBreak extends Break {
+		length () {
+			return 1;
+		}
+		value () {
+			return '\n';
+		}
+		
+		insertInto(parent, ref) {
+			Embed.prototype.insertInto.call(this, parent, ref);
+		}
+	}
+
+	SmartBreak.blotName = 'break';
+	SmartBreak.tagName = 'BR';
+
+	window.Quill.register(SmartBreak);
+
 	var init = function () {
 
 		window.Quill.register('modules/markdownShortcuts', window.MarkdownShortcuts);
@@ -28,6 +56,11 @@
 			var editor = new window.Quill(editorCtn.get(0), {
 				theme: 'bubble',
 				modules: {
+					clipboard: {
+						matchers: [
+							['BR', lineBreakMatcher] 
+						]
+					},
 					toolbar: {
 						container: [
 							[{ header: [false, 1, 2, 3, 4, 5, 6] }],
@@ -44,7 +77,27 @@
 							image: imageHandler
 						}
 					},
-					markdownShortcuts: {}
+					markdownShortcuts: {},
+					keyboard: {
+						bindings: {
+							linebreak: {
+								key: 13,
+								shiftKey: true,
+								handler: function (range) {
+									var currentLeaf = this.quill.getLeaf(range.index)[0];
+									var nextLeaf = this.quill.getLeaf(range.index + 1)[0];
+						
+									this.quill.insertEmbed(range.index, 'break', true, 'user');
+						
+									if (nextLeaf === null || (currentLeaf.parent !== nextLeaf.parent)) {
+										this.quill.insertEmbed(range.index, 'break', true, 'user');
+									}
+
+									this.quill.setSelection(range.index + 1, window.Quill.sources.SILENT);
+								}
+							}
+						}
+					}
 				}
 			});
 
