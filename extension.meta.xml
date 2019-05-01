@@ -12,6 +12,10 @@
 		</author>
 	</authors>
 	<releases>
+		<release version="2.0.0" date="2019-05-01" min="4.x">
+			- New ui for Symphony 4 alpha 3
+			- Better line break support
+		</release>
 		<release version="1.1.0" date="2018-10-31" min="2.7">
 			- Added line break support
 		</release>

@@ -1,66 +1,57 @@
 (function($, Symphony, undefined) {
-
+	
 	'use strict';
-
+	
 	var sels = {
 		item: 'textarea[class*="markdown"], textarea[class*="commonmark"]'
 	};
+	
+	var placeholders = [
+		'Your text goes here...'
+	];
+	
+	var Parchment = Quill.import('parchment');
+	var Delta = Quill.import('delta');
 
-	var Delta = window.Quill.import('delta');
-	var Break = window.Quill.import('blots/break');
-	var Embed = window.Quill.import('blots/embed');
+	var LineBreakClass = new Parchment.Attributor.Class('linebreak', 'linebreak', {
+		scope: Parchment.Scope.BLOCK
+	});
 
-	var lineBreakMatcher = function () {
-		var newDelta = new Delta();
-		newDelta.insert({'break': ''});
-		return newDelta;
-	};
-
-	class SmartBreak extends Break {
-		length () {
-			return 1;
-		}
-		value () {
-			return '\n';
-		}
-		
-		insertInto(parent, ref) {
-			Embed.prototype.insertInto.call(this, parent, ref);
-		}
-	}
-
-	SmartBreak.blotName = 'break';
-	SmartBreak.tagName = 'BR';
-
-	window.Quill.register(SmartBreak);
+	Quill.register('formats/linebreak', LineBreakClass);
 
 	var init = function () {
-
+		
 		window.Quill.register('modules/markdownShortcuts', window.MarkdownShortcuts);
-
+		
 		var imageHandler = function () {
 			var range = this.quill.getSelection();
 			var value = window.prompt('Paste your image URL');
 			this.quill.insertEmbed(range.index, 'image', value, window.Quill.sources.USER);
 		};
-
+		
+		var randomPlaceholder = function () {
+			return placeholders[Math.floor(Math.random() * placeholders.length)];
+		};
+		
 		$(sels.item).each(function () {
 			var t = $(this);
-			t.closest('.field').addClass('quill-ctn');
 			var savedValue = t.val();
 			var parsedMD = window.markdownit().render(savedValue);
-			t.hide();
+
+			parsedMD = parsedMD.replace(new RegExp('\n$', 's'), '');
+			parsedMD = parsedMD.replace(/<br>/g, '</p><p class="linebreak-true">');
+
 			var editorCtn = $('<div />').html(parsedMD);
 			var ctn = $('<div />').addClass('quill-editor').append(editorCtn);
+
 			t.parent().append(ctn);
+			t.closest('.field').addClass('quill-ctn');
+			t.hide();
+
 			var editor = new window.Quill(editorCtn.get(0), {
 				theme: 'bubble',
+				placeholder: randomPlaceholder(),
 				modules: {
-					clipboard: {
-						matchers: [
-							['BR', lineBreakMatcher] 
-						]
-					},
 					toolbar: {
 						container: [
 							[{ header: [false, 1, 2, 3, 4, 5, 6] }],
@@ -80,20 +71,30 @@
 					markdownShortcuts: {},
 					keyboard: {
 						bindings: {
-							linebreak: {
+							smartbreak: {
 								key: 13,
 								shiftKey: true,
-								handler: function (range) {
-									var currentLeaf = this.quill.getLeaf(range.index)[0];
-									var nextLeaf = this.quill.getLeaf(range.index + 1)[0];
-						
-									this.quill.insertEmbed(range.index, 'break', true, 'user');
-						
-									if (nextLeaf === null || (currentLeaf.parent !== nextLeaf.parent)) {
-										this.quill.insertEmbed(range.index, 'break', true, 'user');
+								handler: function (range, context) {
+									this.quill.setSelection(range.index, 'silent');
+									this.quill.insertText(range.index, '\n', 'user');
+									this.quill.setSelection(range.index + 1, 'silent');
+									this.quill.format('linebreak', true, 'user');
+								}
+							},
+							paragraph: {
+								key: 13,
+								handler: function (range, context) {
+									this.quill.setSelection(range.index, 'silent');
+									this.quill.insertText(range.index, '\n', 'user');
+									this.quill.setSelection(range.index + 1, 'silent');
+									let f = this.quill.getFormat(range.index + 1);
+									if(f.hasOwnProperty('linebreak')) {
+										delete(f.linebreak);
+										this.quill.removeFormat(range.index + 1);
+										for(let key in f) {
+											this.quill.formatText(range.index + 1, key, f[key]);
+										}
 									}
-
-									this.quill.setSelection(range.index + 1, window.Quill.sources.SILENT);
 								}
 							}
 						}
@@ -102,13 +103,17 @@
 			});
 
 			editor.on('text-change', function () {
-				var raw = editor.container.firstChild.innerHTML;
+				var raw = $(editor.container.firstChild).clone().html();
+				raw = raw.replace(/<\/p><p class="linebreak-true">/g, '<br/>').replace(/<br><\/p>/g, '</p>');
+				raw = raw.replace(/<p><br><\p>/g, '');
+
 				var markdown = new window.TurndownService({
 					headingStyle: 'atx'
 				}).turndown(raw);
+
 				t.val(markdown);
 			});
-
+			
 			editor.clipboard.addMatcher(window.Node.ELEMENT_NODE, function (node, delta) {
 				delta.ops = delta.ops.map(function (op) {
 					return {
@@ -117,10 +122,10 @@
 				});
 				return delta;
 			});
-
+			
 		});
 	};
-
+	
 	$(init);
-
+	
 }(window.jQuery, window.Symphony));
