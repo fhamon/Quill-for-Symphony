@@ -7,7 +7,9 @@
 	};
 	
 	var placeholders = [
-		'Your text goes here...'
+		'Type it like you mean it…',
+		'I can’t believe, today was a good day…',
+		'How much pizzazz is up to you…'
 	];
 	
 	var Parchment = Quill.import('parchment');

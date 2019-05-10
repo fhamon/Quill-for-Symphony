@@ -5,7 +5,7 @@
 .quill-editor {
 	background-color: var(--color-clear);
 	min-height: 15rem;
-	border: 2px dashed var(--color-main-lightest);
+	border: 2px dashed var(--color-main-lighter);
 	padding: var(--spacing-small);
 	border-radius: var(--radius-current);
 }
@@ -23,7 +23,7 @@
 	font-style: italic;
 	pointer-events: none;
 	position: absolute;
-	font-size: 3.2rem;
+	font-size: 2rem;
 	left: 0;
 	right: 0;
 }
@@ -97,12 +97,12 @@
 	z-index: 101;
 	box-shadow: var(--shadow);
 	background-color: var(--color-clear);
-	border: 1px solid var(--color-main-lightest);
+	border: 1px solid var(--color-main-lighter);
 	color: var(--color-main);
 }
 
 .ql-bubble .ql-tooltip-arrow {
-	border-bottom: 6px solid var(--color-main-lightest) !important;
+	border-bottom: 6px solid var(--color-main-lighter) !important;
 }
 
 .ql-bubble .ql-picker.ql-expanded .ql-picker-options {
@@ -151,7 +151,7 @@
 .ql-bubble .ql-picker-options {
 	background-color: var(--color-clear);
 	box-shadow: var(--shadow);
-	border: 1px solid var(--color-main-lightest);
+	border: 1px solid var(--color-main-lighter);
 	border-bottom-left-radius: var(--radius-current);
 	border-bottom-right-radius: var(--radius-current);
 }
@@ -171,10 +171,10 @@
 .ql-container.ql-bubble:not(.ql-disabled) a::before {
 	color: var(--color-main);
 	box-shadow: var(--shadow);
-	border: 1px solid var(--color-main-lightest);
+	border: 1px solid var(--color-main-lighter);
 	background-color: var(--color-clear);
 }
 
 .ql-container.ql-bubble:not(.ql-disabled) a::after {
-	border-top: 6px solid var(--color-main-lightest) !important;
+	border-top: 6px solid var(--color-main-lighter) !important;
 }
